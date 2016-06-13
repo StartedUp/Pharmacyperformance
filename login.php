@@ -1,6 +1,8 @@
 <?php
-session_start(); 
 function SignIn() { 
+   session_start();
+   echo "session";
+$_SESSION['login'] = true;
 $host="localhost"; // Host name 
 $username="pharmape_dbadmin"; // Mysql username 
 $password="FDzFXlaHz5!3"; // Mysql password 
@@ -15,37 +17,28 @@ if (!$conn) {
 $myusername=$_POST['username']; 
 $mypassword=$_POST['password']; 
 //starting the session for user profile page 
-if(!empty($_POST['username']))
-{
-// To protect MySQL injection (more detail about MySQL injection)
-   $myusername = stripslashes($myusername);
-   $mypassword = stripslashes($mypassword);
-   $myusername = mysqli_real_escape_string($conn,$myusername);
-   $mypassword = mysqli_real_escape_string($conn,$mypassword);
-   $sql="SELECT * FROM $tbl_name WHERE id='$myusername' and password='$mypassword'";
-   $result=mysqli_query($conn,$sql);
-// Mysql_num_row is counting table row
-   $count=mysqli_num_rows($result);
-mysqli_close($conn);
-// If result matched $myusername and $mypassword, table row must be 1 row
-   if($count==1){
-
-// Register $myusername, $mypassword and redirect to file "login_success.php"
-/*session_register("myusername");
-session_register("mypassword"); */
-/*$_SESSION['name']=$name;*/
-$_SESSION['id']="$myusername";
-/*header("location:dashboard_page.php");*/
-/*echo "success";*/
-header("location:dashboard.php");
-}
-else {
-   echo "Wrong Username or Password";
-}
-}
+      if(!empty($_POST['username'])){
+         // To protect MySQL injection (more detail about MySQL injection)
+         $myusername = stripslashes($myusername);
+         $mypassword = stripslashes($mypassword);
+         $myusername = mysqli_real_escape_string($conn,$myusername);
+         $mypassword = mysqli_real_escape_string($conn,$mypassword);
+         $sql="SELECT * FROM $tbl_name WHERE id='$myusername' and password='$mypassword'";
+         $result=mysqli_query($conn,$sql);
+         // Mysql_num_row is counting table row
+         $count=mysqli_num_rows($result);
+         mysqli_close($conn);
+         // If result matched $myusername and $mypassword, table row must be 1 row
+         if($count==1){
+         $_SESSION['id']=$myusername;
+         header("location:dashboard.php");
+      }else {
+         echo "Wrong Username or Password";
+      }
+   }
 }
 if(isset($_POST['submit']))
-{
+{  
    SignIn();
 }
 ?>
