@@ -82,6 +82,10 @@ echo $_SESSION[id]."logged in";
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
+  var today = new Date().toISOString().substring(0, 10);
+  var minDay =new Date()
+  minDay.setDate(1);
+  $('input[type="date"]').attr({min:minDay.toISOString().substring(0, 10),max:today});
   $('button[type ="button"]').click(function(){
     var clientId = <?php echo json_encode($_SESSION['id']); ?>;
     var salesType = this.id;
