@@ -13,8 +13,9 @@
 			die("Connection failed: " . mysqli_connect_error());
 			}
 			$month=date("m");
+			$year=date("Y");
 			$sales_type_id = mysqli_real_escape_string($conn,$_POST['salesType']);
-			$selectTarget="SELECT sales_target,id FROM target WHERE user_id=$userId and MONTH(date) = $month and sales_type_id =$sales_type_id";
+			$selectTarget="SELECT sales_target,id FROM target WHERE user_id=$userId and MONTH(date) = $month and YEAR(date)=$year and sales_type_id =$sales_type_id";
 			$selectTargetResult=mysqli_query($conn,$selectTarget);
 			if ($selectTargetResult) {
 				$targetObj = mysqli_fetch_object($selectTargetResult);
@@ -27,10 +28,12 @@
 					$data[] = $targetObj;    
 					echo json_encode($data);
 				}else{
-					echo 0;
+					$data = '"Error" : "Target is not set"';
+					echo json_encode($data);
 				}
 			}else {
-				echo 1;
+				$data = '"Error : Sales is Empty"';
+				echo json_encode($data);
 			die();
 			}
 			

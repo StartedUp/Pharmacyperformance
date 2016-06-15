@@ -81,11 +81,37 @@ echo $_SESSION[id]."logged in";
   </form>
 </div>
 <script type="text/javascript">
+function prepopulate (data) {
+  if (validate(data)) {
+    for (var i = 0; i < data.length; i++) {
+      $('#'+data[i].name+'Target').val(data[i].sales_target).css('background-color','#eee');
+    };
+  };
+}
+function validate (data) {
+  data=JSON.stringify(data);
+  return true;
+}
 $(document).ready(function(){
   var today = new Date().toISOString().substring(0, 10);
   var minDay =new Date()
   minDay.setDate(1);
   $('input[type="date"]').attr({min:minDay.toISOString().substring(0, 10),max:today});
+
+  var formData = {
+      'client'    : 100001,
+      'label'     :'getMonthlyTargetOfAllSalesTypeOfClient'
+    };
+  $.ajax({
+      type: 'POST',
+      url: 'model/targetDao.php',
+      data: formData,
+      success: function(data) {
+        data =JSON.parse(data);
+        prepopulate(data);
+      }
+  });
+
   $('button[type ="button"]').click(function(){
     var clientId = <?php echo json_encode($_SESSION['id']); ?>;
     var salesType = this.id;
