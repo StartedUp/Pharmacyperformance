@@ -1,10 +1,10 @@
 <?php
-	if(!$_SESSION['login']){
+	/*if(!$_SESSION['login']){
    header("location:login.php");
    die;
 }
 	$userId=$_SESSION['id'];
-	echo $userId;
+	echo $userId;*/
 ?>
 <html>
 <head>
@@ -15,47 +15,30 @@
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script type="text/javascript">
 	google.charts.load('current', {packages: ['corechart', 'bar']});
-	google.charts.setOnLoadCallback(drawChart);
-	function drawChart() {
-		<?php
-		$userId=100001;
-		$host="localhost"; // Host name 
-		$username="pharmape_dbadmin"; // Mysql username 
-		$password="FDzFXlaHz5!3"; // Mysql password 
-		$db_name="pharmape_perfdb"; // Database name 
-		$tbl_name="user"; // Table name 
+	function drawChart(data) {
+		if(validateData(data)){
+			console.log(data);
+			var salesTarget= Number(getTarget(data));
+			var achieved = getTotalSales(data);
+			var remaining = salesTarget-achieved;
+			var data = google.visualization.arrayToDataTable([
+				['Type', 'sale'],
+				['Achieved',    achieved],
+				['Remaining',    remaining]
+				]);
 
-		// Connect to server and select databse.
-		$conn =mysqli_connect("$host", "$username", "$password","$db_name");
-		if (!$conn) {
-		die("Connection failed: " . mysqli_connect_error());
+			var options = {
+				title: 'Target - Sales Percentage',
+				pieHole: 0.4,
+			};
+
+			var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+			chart.draw(data, options);
 		}
-		$sql="SELECT sales_target FROM `target` WHERE id=1";
-		$result=mysqli_query($conn,$sql);
-		$value = mysqli_fetch_object($result);
-		echo "var salesTarget =".$value->sales_target.";";
-		mysqli_close($conn);
-
-		?>
-		var achieved = 814;
-		var remaining = salesTarget-achieved;
-		var data = google.visualization.arrayToDataTable([
-			['Type', 'sale'],
-			['Achieved',    achieved],
-			['Remaining',    remaining]
-			]);
-
-		var options = {
-			title: 'Target - Sales Percentage',
-			pieHole: 0.4,
-		};
-
-		var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
-		chart.draw(data, options);
 	}
-	google.charts.setOnLoadCallback(drawBarChart);
-      function drawBarChart() {
-        var data = google.visualization.arrayToDataTable([
+      function drawBarChart(data) {
+      	if (validateData(data)) {
+        var data = google.visualization.arrayToDataTable(/*[
           ['Day', 'Sales'],
           ['1', 130],
           ['2', 225],
@@ -87,42 +70,86 @@
           ['28', 0],
           ['29', 0],
           ['30',0 ]
-        ]);
+        ]*/
+        getDailySales(data));
 
         var options = {
           chart: {
             title: 'sales per day',
           },
-          vAxis: {
-            minValue: 0,
-            ticks: [0, 50, 100, 150, 200, 250]
-          }
         };
 
         var chart = new google.charts.Bar(document.getElementById('chart_div'));
 
         chart.draw(data, options);
+        };
       }
+      function validateData (data) {
+      	return true;
+      }
+      function getDailySales (data) {
+      	var dailySales = [];
+      	var heading=['Day', 'Sales'];
+      	dailySales.push(heading);
+      	for (var i = 0; i <data.length - 1; i++) {
+      		var oneDaySales=[Number(data[i].Day),Number(data[i].sales)];
+      		dailySales.push(oneDaySales);
+      	};
+      	return dailySales;
+      }
+      function getTarget (data) {
+      	return data[data.length-1].sales_target;
+      }
+      function getTotalSales (data) {
+      	var totalSales =0;
+      	for (var i = 0; i < data.length-1; i++) {
+      		totalSales+=Number(data[i].sales);
+      	};
+      	return totalSales;
+      }
+      $(document).ready(function(){
+      	var clientId = <?php echo json_encode($_SESSION['id']); ?>;
+      	$('#sel1').change(function(){
+      		var formData = {
+      			'salesType' : $('select').val()
+      		};
+      		if ($('select').val()!="0") {
+      			$.ajax({
+      				type: 'POST',
+      				url: 'getStatistics.php',
+      				data: formData,
+      				success: function(data){
+      					data =JSON.parse(data);
+      					drawChart(data);
+      					drawBarChart(data);
+      				}
+      			});
+      		};
+      	});
+      });
 	</script>
-
 </head>
-  <body>
-  	<div class="container-fluid">
-  		<div class="dropdown">
-  			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sales Type
-  				<span class="caret"></span></button>
-  				<ul class="dropdown-menu">
-  					<li><a href="#">Prescriptions Issued</a></li>
-  					<li><a href="#">Clinical income</a></li>
-  					<li><a href="#">MUR</a></li>
-  					<li><a href="#">NMS</a></li>
-  					<li><a href="#">Retail</a></li>
-  				</ul>
-  			</div>
-  		</div>
-  		<h3>UserId 100001</h2>
-  		<div id="donutchart" style="width: 630px; height: 350px;"></div>
-  		<div id="chart_div" class="text-right" ></div>
-  	</div>
-  </body>
+<body>
+	<div class="container-fluid">
+		<div class="dropdown">
+			<div class="form-group">
+				<label for="sel1">Select Sales type:</label>
+				<select class="form-control col-sm-3" id="sel1">
+					<option value="0">Sales Type</option>
+					<option value="1">prescriptions_issued</option>
+					<option value="2">clinical_income</option>
+					<option value="3">MUR</option>
+					<option value="4">NMS</option>
+					<option value="5">retail</option>
+				</select>
+			</div>
+		</div>
+		<h3>UserId 100001</h2>
+			<div id="donutchart" style="width: 630px; height: 350px;"></div>
+			<div id="chart_div" class="text-right" ></div>
+		</div>
+		<script type="text/javascript">
+		
+		</script>
+	</body>
 </html>
