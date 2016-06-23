@@ -1,6 +1,7 @@
 <?php
+	include 'CONSTANTS.php';
 		if ( !empty($_POST) ) {
-			$userId=100001;
+			//$userId=100001;
 			$host="localhost"; // Host name 
 			$username="pharmape_dbadmin"; // Mysql username 
 			$password="FDzFXlaHz5!3"; // Mysql password 
@@ -12,10 +13,14 @@
 			if (!$conn) {
 			die("Connection failed: " . mysqli_connect_error());
 			}
+			$client = $_POST['client'];
+        	$client = mysqli_real_escape_string($conn,$client);
 			$month=date("m");
 			$year=date("Y");
-			$sales_type_id = mysqli_real_escape_string($conn,$_POST['salesType']);
-			$selectTarget="SELECT sales_target,id FROM target WHERE user_id=$userId and MONTH(date) = $month and YEAR(date)=$year and sales_type_id =$sales_type_id";
+			$sales_type = mysqli_real_escape_string($conn,$_POST['salesType']);
+			$sales_type=$sales_type."";
+			$sales_type_id=$sales_type_id_array[$sales_type];
+			$selectTarget="SELECT sales_target,id FROM target WHERE user_id=$client and MONTH(date) = $month and YEAR(date)=$year and sales_type_id =$sales_type_id";
 			$selectTargetResult=mysqli_query($conn,$selectTarget);
 			if ($selectTargetResult) {
 				$targetObj = mysqli_fetch_object($selectTargetResult);

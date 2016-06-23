@@ -1,4 +1,7 @@
 <?php
+include 'CONSTANTS.php';
+$sales_type='prescriptions_issued';
+echo $sales_type_id_array[$sales_type];
 if(isset($_POST['submit'])) {
 $host="localhost"; // Host name 
 $username="pharmape_dbadmin"; // Mysql username 

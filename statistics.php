@@ -1,18 +1,19 @@
 <?php
-	/*if(!$_SESSION['login']){
-   header("location:login.php");
+	if(empty($_GET)){
+  echo "Unauthorised";
    die;
 }
 	$userId=$_SESSION['id'];
-	echo $userId;*/
+	echo $userId;
 ?>
 <html>
 <head>
+  <title>Statistics</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script type="text/javascript">
 	google.charts.load('current', {packages: ['corechart', 'bar']});
 	function drawChart(data) {
@@ -107,44 +108,36 @@
       	};
       	return totalSales;
       }
-      $(document).ready(function(){
-      	var clientId = <?php echo json_encode($_SESSION['id']); ?>;
-      	$('#sel1').change(function(){
-      		var formData = {
-      			'salesType' : $('select').val()
-      		};
-      		if ($('select').val()!="0") {
-      			$.ajax({
-      				type: 'POST',
-      				url: 'getStatistics.php',
-      				data: formData,
-      				success: function(data){
-      					data =JSON.parse(data);
-      					drawChart(data);
-      					drawBarChart(data);
-      				}
-      			});
-      		};
-      	});
+      function sendAjax () {
+        var data = <?php echo json_encode($_GET) ?>;
+        var formData = {
+         'salesType' : data.salesType,
+         'client'    : data.client,
+         'password'  : data.password
+       };
+       $.ajax({
+        type: 'POST',
+        url: 'getStatistics.php',
+        data: formData,
+        success: function(data){
+         data =JSON.parse(data);
+         drawChart(data);
+         drawBarChart(data);
+       }
       });
+       var type = data.salesType.replace("_"," ").toUpperCase();
+       $('#salesType').html(type);
+      }
+      $(document).ready(function(){
+      	window.setTimeout(sendAjax,1000);
+     });
 	</script>
 </head>
 <body>
 	<div class="container-fluid">
-		<div class="dropdown">
-			<div class="form-group">
-				<label for="sel1">Select Sales type:</label>
-				<select class="form-control col-sm-3" id="sel1">
-					<option value="0">Sales Type</option>
-					<option value="1">prescriptions_issued</option>
-					<option value="2">clinical_income</option>
-					<option value="3">MUR</option>
-					<option value="4">NMS</option>
-					<option value="5">retail</option>
-				</select>
-			</div>
-		</div>
-		<h3>UserId 100001</h2>
+      <div class='text-center'>
+        <h1 id='salesType'></h1>
+      </div>
 			<div id="donutchart" style="width: 630px; height: 350px;"></div>
 			<div id="chart_div" class="text-right" ></div>
 		</div>

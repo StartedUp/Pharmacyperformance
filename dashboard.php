@@ -26,7 +26,23 @@ echo $_SESSION[id]."logged in";
   <div class="row">
   <div class="col-sm-4"></div>
   <div class="col-sm-4">Logo</div>
-  <div class="col-sm-4"><input id="stats" value='Statistics' type="button" class="btn btn-default" onclick="window.location.href='statistics.php'"></div>
+  <div class="col-sm-4">
+    <!-- <input id="stats" value='Statistics' type="button" class="btn btn-default" onclick="window.location.href='statistics.php'"> -->
+    <div class="dropdown">
+      <div class="form-group">
+        <label for="sel1">Select Sales type:</label>
+        <select class="form-control col-sm-3" id="sel1">
+          <option >Sales Type</option>
+          <option >prescriptions_issued</option>
+          <option >clinical_income</option>
+          <option >MUR</option>
+          <option >NMS</option>
+          <option >retail</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
 </div>
   <h3>Prescriptions issued</h3>
   <form class="form-inline" role="form">
@@ -92,6 +108,11 @@ function validate (data) {
   data=JSON.stringify(data);
   return true;
 }
+function prepopulateSales (data) {
+  if (validate(data)) {
+    $('#'+data.name+'Sales').val(data.sales).css('background-color','#eee');
+  };
+}
 $(document).ready(function(){
   var today = new Date().toISOString().substring(0, 10);
   var minDay =new Date()
@@ -110,6 +131,50 @@ $(document).ready(function(){
         data =JSON.parse(data);
         prepopulate(data);
       }
+  });
+
+  $('#sel1').change(function(){
+    var formData = {
+      'salesType' : $('select').val(),
+      'client'    : 100001,
+      'password'  : ''
+    };
+    if ($('select').val()!="0") {
+      /*$.ajax({
+        type: 'POST',
+        url: 'getStatistics.php',
+        data: formData,
+        success: function(data){
+          data =JSON.parse(data);
+          drawChart(data);
+          drawBarChart(data);
+        }
+      });*/
+      window.open('http://www.pharmacyperformance.online/statistics.php?salesType='+$('select').val()+'&client=100001&password=');
+    };
+  });
+
+  $('input[type="date"]').change(function(){
+    console.log('enterd prepopulateSales')
+    $(this).css('background-color','#fff');
+    var salesType = this.id.replace('Date','');
+    console.log($('#'+this.id).val());
+    var formData = {
+      'date'      : $('#'+this.id).val(),
+      'client'    : 100001,
+      'salesType' : salesType,
+      'label'     :'getSalesOfTheDay'
+    };
+    $.ajax({
+      type: 'POST',
+      url: 'model/salesDao.php',
+      data: formData,
+      success: function(data) {
+        data =JSON.parse(data);
+        console.log(data);
+        prepopulateSales(data);
+      }
+    });
   });
 
   $('button[type ="button"]').click(function(){
