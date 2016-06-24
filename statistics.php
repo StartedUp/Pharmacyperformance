@@ -129,7 +129,7 @@
        $('#salesType').html(type);
       }
       $(document).ready(function(){
-      	window.setTimeout(sendAjax,1000);
+      	window.setTimeout(sendAjax,2000);
      });
 	</script>
 </head>

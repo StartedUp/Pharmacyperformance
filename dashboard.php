@@ -14,12 +14,8 @@ echo $_SESSION[id]."logged in";
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<style>
-.ui-datepicker-calendar {
-    display: none;
-    }
-</style>
-  </script>
+  <link  href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
 </head>
 <body>
 <div class="container">
@@ -47,7 +43,7 @@ echo $_SESSION[id]."logged in";
   <h3>Prescriptions issued</h3>
   <form class="form-inline" role="form">
     <div class="form-group">
-      <p3>Pick a Date: <input type="date"  id="prescriptions_issuedDate" class="date-picker" /></p3>
+      <p3>Pick a Date: <input type="text"  id="prescriptions_issuedDate" class="datepicker" /></p3>
     </div> 
     <div class="form-group">
       <input type="text" class="col-sm-3 form-control" id="prescriptions_issuedSales" placeholder="Sales"></li>
@@ -58,7 +54,7 @@ echo $_SESSION[id]."logged in";
   <h3>Clinical income</h3>
   <form class="form-inline" role="form">
     <div class="form-group">
-      <p3>Pick a Date: <input type="date"  id="clinical_incomeDate" class="date-picker" /></p3>
+      <p3>Pick a Date: <input type="text"  id="clinical_incomeDate" class="datepicker" /></p3>
     </div> 
     <div class="form-group">
       <input type="text" class="col-sm-3 form-control" id="clinical_incomeSales" placeholder="Sales">
@@ -68,7 +64,7 @@ echo $_SESSION[id]."logged in";
   <h3>MUR</h3>
   <form class="form-inline" role="form">
     <div class="form-group">
-      <p3>Pick a Date: <input type="date"  id="MURDate" class="date-picker" /></p3>
+      <p3>Pick a Date: <input type="text"  id="MURDate" class="datepicker" /></p3>
     </div> 
     <div class="form-group">
       <input type="text" class="col-sm-3 form-control" id="MURSales" placeholder="Sales">
@@ -78,7 +74,7 @@ echo $_SESSION[id]."logged in";
   <h3>NMS</h3>
   <form class="form-inline" role="form">
     <div class="form-group">
-      <p3>Pick a Date: <input type="date"  id="NMSDate" class="date-picker" /></p3>
+      <p3>Pick a Date: <input type="text"  id="NMSDate" class="datepicker" /></p3>
     </div> 
     <div class="form-group">
       <input type="text" class="col-sm-3 form-control" id="NMSSales" placeholder="Sales">
@@ -88,7 +84,7 @@ echo $_SESSION[id]."logged in";
   <h3>Retail</h3>
   <form class="form-inline" role="form">
     <div class="form-group">
-      <p3>Pick a Date: <input type="date"  id="retailDate" class="date-picker" /></p3>
+      <p3>Pick a Date: <input type="text"  id="retailDate" class="datepicker" /></p3>
     </div> 
     <div class="form-group">
       <input type="text" class="col-sm-3 form-control" id="retailSales" placeholder="Sales">
@@ -118,6 +114,10 @@ $(document).ready(function(){
   var minDay =new Date()
   minDay.setDate(1);
   $('input[type="date"]').attr({min:minDay.toISOString().substring(0, 10),max:today});
+
+  $(function(){
+      $('.datepicker').datepicker({stepMonths: 0,maxDate: '0',dateFormat: "yy-mm-dd" });
+  });
 
   var formData = {
       'client'    : 100001,
@@ -154,7 +154,7 @@ $(document).ready(function(){
     };
   });
 
-  $('input[type="date"]').change(function(){
+  $('.datepicker').change(function(){
     console.log('enterd prepopulateSales')
     $(this).css('background-color','#fff');
     var salesType = this.id.replace('Date','');
