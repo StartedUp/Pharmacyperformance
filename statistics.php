@@ -138,7 +138,7 @@
       <div class='text-center'>
         <h1 id='salesType'></h1>
       </div>
-			<div id="donutchart" style="width: 630px; height: 350px;"></div>
+			<div id="donutchart" style="width: 420px; height: 300px;"></div>
 			<div id="chart_div" class="text-right" ></div>
 		</div>
 		<script type="text/javascript">
